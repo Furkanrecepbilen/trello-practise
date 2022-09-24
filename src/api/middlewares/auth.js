@@ -18,7 +18,7 @@ exports.generateAccessToken = (user) => {
 };
 
 exports.authenticateToken = (req, res, next) => {
-  const authHeader = req.headers["Authorization"];
+  const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
 
   if (!token)
@@ -38,7 +38,7 @@ exports.authenticateToken = (req, res, next) => {
         .status(400)
         .json(
           createBaseResponse(
-            trye,
+            true,
             undefined,
             ERROR_CODES.ERR_00001,
             req.headers["language"]

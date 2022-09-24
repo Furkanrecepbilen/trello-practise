@@ -60,9 +60,73 @@ exports.register = async (req, res, next) => {
           createBaseResponse(false, body, undefined, req.headers["language"])
         );
     } else {
-      throw { message: ERROR_CODES.ERR_00059 };
+      throw { message: ERROR_CODES.ERR_00003 };
     }
   } catch (err) {
+    return res
+      .status(400)
+      .json(
+        createBaseResponse(
+          true,
+          undefined,
+          err.message,
+          req.headers["language"]
+        )
+      );
+  }
+};
+
+exports.getProfile = async (req, res, next) => {
+  try {
+    const user = await UserModel.findById(req.user.id);
+    if (user) {
+      return res
+        .status(200)
+        .json(
+          createBaseResponse(false, user, undefined, req.headers["language"])
+        );
+    } else {
+      throw { message: ERROR_CODES.ERR_00004 };
+    }
+  } catch (err) {
+    return res
+      .status(400)
+      .json(
+        createBaseResponse(
+          true,
+          undefined,
+          err.message,
+          req.headers["language"]
+        )
+      );
+  }
+};
+exports.forgotpassword = async (req, res, next) => {
+  try {
+    const body = req.body;
+    const user = await UserModel.findById(req.user.id);
+    if (user) {
+      const compare = await bcrypt.compare(body.oldPassword, user.password);
+      if (compare) {
+        const hash = await bcrypt.hash(body.newPassword, SALT_ROUNDS);
+
+        user.password = hash;
+
+        user.save();
+
+        return res
+          .status(200)
+          .json(
+            createBaseResponse(false, user, undefined, req.headers["language"])
+          );
+      } else {
+        throw { message: ERROR_CODES.ERR_00004 };
+      }
+    } else {
+      throw { message: ERROR_CODES.ERR_00004 };
+    }
+  } catch (err) {
+    console.log(err);
     return res
       .status(400)
       .json(

@@ -7,11 +7,18 @@ const port = require("./src/api/config/config.js").PORT;
 const DB_USERNAME = require("./src/api/config/config.js").DB_USERNAME;
 const DB_PASSWORD = require("./src/api/config/config.js").DB_PASSWORD;
 const userRouter = require("./src/api/routes/user");
+const todoRouter = require("./src/api/routes/todo");
 const app = express();
 
 app.use(bodyParser());
 app.use(morgan("dev"));
 app.use(cors());
+app.use(express.json());
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
 
 mongoose.connect(
   "mongodb+srv://" +
@@ -19,6 +26,9 @@ mongoose.connect(
     ":" +
     DB_PASSWORD +
     "@furkanrecepbilen.ltjmntn.mongodb.net/?retryWrites=true&w=majority",
+  {
+    dbName: "trello",
+  },
   (err) => {
     if (err) {
       console.log(err);
@@ -29,6 +39,7 @@ mongoose.connect(
 );
 
 app.use("/api/user", userRouter);
+app.use("/api/todo", todoRouter);
 
 app.listen(port, (err, result) => {
   if (err) {
